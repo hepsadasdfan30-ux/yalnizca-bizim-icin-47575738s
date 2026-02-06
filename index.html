@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sadece Senin İçin ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #fff0f3 0%, #ffe6ea 100%);
+            min-height: 100vh;
+            margin: 0; padding: 20px;
+            overflow-y: auto; overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative;
+        }
+
+        /* --- GEÇİŞ EFEKTİ İÇİN STİLLER (YENİ) --- */
+        #transition-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9999;
+        }
+        
+        .transition-heart {
+            position: absolute;
+            font-size: 30px;
+            /* Kalpler büyüyüp yukarı süzülerek kaybolacak */
+            animation: heartBurst 1.5s ease-out forwards;
+        }
+
+        @keyframes heartBurst {
+            0% { transform: scale(0); opacity: 0; }
+            20% { transform: scale(1.5); opacity: 1; } /* Patlama anı */
+            100% { transform: scale(2) translateY(-100px); opacity: 0; } /* Kayboluş */
+        }
+
+        /* --- ANA KUTU VE YILAN AYARLARI --- */
+        .main-container {
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 30px; 
+            box-shadow: 0 20px 50px rgba(255, 77, 77, 0.15); 
+            width: 95%; 
+            max-width: 1100px; 
+            text-align: center; 
+            transition: opacity 0.5s; 
+            margin-bottom: 50px; 
+            position: relative; 
+            z-index: 10;
+            overflow: visible; 
+        }
+
+        /* Yılanın yaşayacağı görünmez katman */
+        #snake-overlay {
+            position: absolute;
+            top: -25px; left: -25px; right: -25px; bottom: -25px;
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        .snake-particle {
+            position: absolute;
+            font-size: 24px; 
+            offset-path: rect(0% 100% 100% 0% round 50px); 
+            animation: snakeMove 15s infinite linear; 
+        }
+
+        @keyframes snakeMove { to { offset-distance: 100%; } }
+
+        /* --- 1. AŞAMA YAN FOTOĞRAFLAR --- */
+        .side-photos-container {
+            position: absolute; top: 50px; width: 250px; display: none; /* JS ile açılacak */ flex-direction: column; gap: 40px; z-index: 5; pointer-events: none;
+            opacity: 0; transition: opacity 2s; /* Yavaşça gelmesi için */
+        }
+        .side-photos-left { left: 20px; }
+        .side-photos-right { right: 20px; }
+
+        .side-photo { width: 100%; border-radius: 12px; border: 6px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .side-photos-left .side-photo:nth-child(odd) { transform: rotate(-6deg); margin-right: 15px; }
+        .side-photos-left .side-photo:nth-child(even) { transform: rotate(6deg); margin-left: 15px; }
+        .side-photos-right .side-photo:nth-child(odd) { transform: rotate(6deg); margin-left: 15px; }
+        .side-photos-right .side-photo:nth-child(even) { transform: rotate(-6deg); margin-right: 15px; }
+        @media (max-width: 1300px) { .side-photos-container { display: none !important; } }
+
+        /* --- 2. AŞAMA DAĞINIK FOTOĞRAFLAR --- */
+        #scattered-items {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40;
+            display: none; opacity: 0; transition: opacity 2s ease-in;
+        }
+
+        .scatter-photo {
+            position: absolute; width: 220px; border-radius: 12px; border: 8px solid white; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Konumlar */
+        #sp1 { top: 10%; left: 15%; transform: rotate(-15deg); }
+        #sp2 { top: 45%; left: 5%; transform: rotate(10deg); }
+        #sp3 { bottom: 15%; left: 20%; transform: rotate(-8deg); }
+        #sp4 { top: 10%; right: 15%; transform: rotate(10deg); }
+        #sp5 { top: 45%; right: 5%; transform: rotate(-15deg); }
+        #sp6 { bottom: 15%; right: 20%; transform: rotate(8deg); }
+        #sp7 { bottom: 5%; left: 50%; transform: translateX(-50%) rotate(2deg); z-index: 41; }
+        
+        @media (max-width: 900px) { #scattered-items { display: none !important; } }
+
+        /* --- EFEKTLER --- */
+        #celebration-overlay, #butterfly-overlay, #heart-rain-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; display: none; 
+        }
+        #butterfly-overlay { z-index: 60; }
+        #heart-rain-overlay { z-index: 35; display: block; } 
+
+        .confetti { position: absolute; top: -10px; width: 10px; height: 10px; animation: fall linear forwards; }
+        .firework { position: absolute; width: 5px; height: 5px; border-radius: 50%; animation: explode 1s ease-out forwards; }
+        .side-decoration { position: fixed; bottom: -100px; font-size: 40px; animation: floatUpSide 4s ease-in-out forwards; }
+        .butterfly-particle { position: absolute; top: 50%; left: 50%; font-size: 30px; transform: translate(-50%, -50%) scale(0); animation: scatterButterflies ease-out forwards; z-index: 55; }
+        .rain-heart { position: absolute; top: -50px; color: #ffb3c1; opacity: 0.5; animation: fallRain linear forwards; }
+
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+        @keyframes fallRain { to { transform: translateY(110vh); } }
+        @keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(30); opacity: 0; } }
+        @keyframes floatUpSide { to { bottom: 110vh; transform: rotate(20deg); } }
+        @keyframes scatterButterflies { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(calc(360deg * var(--rot))); opacity: 0; } }
+
+        h2 { font-family: 'Pacifico', cursive; color: #ff4d6d; font-size: 2.2rem; margin-bottom: 25px; }
+        .questions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
+        .question-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; min-height: 150px; border: 2px solid transparent; transition: 0.3s; }
+        .question-card.error { border-color: #ff4d6d; background-color: #fff5f5; animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .question-card label { display: block; font-weight: 700; color: #555; margin-bottom: 12px; font-size: 1rem; text-align: left; }
+        .word-row { display: flex; gap: 3px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+        
+        .letter-box { width: 40px; height: 38px; border: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffccd5'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; background-size: contain; background-color: transparent; text-align: center; font-size: 1.2rem; font-weight: bold; color: #d6336c; text-transform: uppercase; outline: none; transition: all 0.2s; padding-bottom: 5px; }
+        .letter-box:focus, .letter-box.filled { transform: scale(1.15); z-index: 10; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"); color: white; }
+        .punctuation { font-size: 1.5rem; font-weight: bold; color: #ff4d6d; margin: 0 5px; user-select: none; }
+        .submit-btn { background: #ff4d6d; color: white; border: none; padding: 18px 60px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .submit-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3); }
+
+        /* --- MEKTUP --- */
+        #envelope-wrapper { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 50; }
+        .envelope { 
+            position: relative; width: 350px; height: 250px; 
+            background: #ff758f; border-radius: 0 0 10px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; 
+        }
+        .envelope::before { 
+            content: ''; position: absolute; top: 0; left: 0; z-index: 4; 
+            border-left: 175px solid transparent; border-right: 175px solid transparent; 
+            border-top: 135px solid #ff4d6d; 
+            transform-origin: top; transition: transform 2s ease-in-out; 
+        }
+        .envelope::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; z-index: 3; 
+            border-left: 175px solid #ff859f; border-right: 175px solid #ff859f; 
+            border-top: 125px solid transparent; border-bottom: 125px solid #ff859f; 
+            border-radius: 0 0 10px 10px; pointer-events: none; 
+        }
+        
+        .letter {
+            position: absolute; top: 10px; left: 15px; 
+            width: 320px; height: 230px; 
+            background: white; border-radius: 5px; padding: 15px; box-sizing: border-box;
+            z-index: 2; transition: transform 2.5s ease-in-out, height 2.5s ease-in-out;
+            text-align: center; overflow: hidden;
+        }
+        .letter h1 { font-family: 'Pacifico'; font-size: 1.3rem; color: #ff4d6d; margin: 0; opacity: 0; transition: opacity 1s 2.5s; }
+        .letter p { font-size: 0.85rem; color: #444; margin: 8px 0; opacity: 0; transition: opacity 1s 2.8s; line-height: 1.4; }
+        
+        .heart-sticker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; color: #fff; z-index: 5; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); transition: opacity 0.5s; }
+        .envelope.open::before { transform: rotateX(180deg); z-index: 1; }
+        .envelope.open .heart-sticker { opacity: 0; }
+        
+        .envelope.open .letter { 
+            transform: translateY(-200px); 
+            height: 480px; 
+            z-index: 6; box-shadow: 0 5px 25px rgba(0,0,0,0.15); 
+        }
+        .envelope.open .letter h1, .envelope.open .letter p { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="transition-overlay"></div>
+    <div id="celebration-overlay"></div>
+    <div id="butterfly-overlay"></div>
+    <div id="heart-rain-overlay"></div>
+
+    <div class="side-photos-container side-photos-left" id="leftPhotos">
+        <img src="foto1.jpeg" class="side-photo" alt="Anı 1">
+        <img src="foto2.jpeg" class="side-photo" alt="Anı 2">
+        <img src="foto3.jpeg" class="side-photo" alt="Anı 3">
+        <img src="foto4.jpeg" class="side-photo" alt="Anı 4">
+    </div>
+    <div class="side-photos-container side-photos-right" id="rightPhotos">
+        <img src="foto5.jpeg" class="side-photo" alt="Anı 5">
+        <img src="foto6.jpeg" class="side-photo" alt="Anı 6">
+        <img src="foto7.jpeg" class="side-photo" alt="Anı 7">
+        <img src="foto8.jpeg" class="side-photo" alt="Anı 8">
+    </div>
+
+    <div id="scattered-items">
+        <img src="ek1.jpeg" class="scatter-photo" id="sp1" alt="Ek 1">
+        <img src="ek2.jpeg" class="scatter-photo" id="sp2" alt="Ek 2">
+        <img src="ek3.jpeg" class="scatter-photo" id="sp3" alt="Ek 3">
+        <img src="ek4.jpeg" class="scatter-photo" id="sp4" alt="Ek 4">
+        <img src="ek5.jpeg" class="scatter-photo" id="sp5" alt="Ek 5">
+        <img src="ek6.jpeg" class="scatter-photo" id="sp6" alt="Ek 6">
+        <img src="ek7.jpeg" class="scatter-photo" id="sp7" alt="Ek 7">
+    </div>
+
+    <div id="welcome-screen" class="main-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; animation: fadeIn 1s;">
+        <h1 style="font-family: 'Pacifico'; color: #ff4d6d; font-size: 2.5rem; margin-bottom: 20px;">Hoş Geldin Güzellik! 🌸</h1>
+        <p style="font-size: 1.2rem; color: #555; line-height: 1.6; margin-bottom: 30px;">
+            Az sonra aramızdaki o güzel anılara ve beni ne kadar iyi tanıdığına dair<br>
+            ufak ve tatlı bir <b>Aşk Testi</b>'ne gireceksin.<br><br>
+            Hazırsan başlayalım mı? 🚀
+        </p>
+        <button class="submit-btn" onclick="startTest()">Teste Başla 💖</button>
+    </div>
+
+    <div id="loginBox" class="main-container" style="display: none; opacity: 0;">
+        
+        <div id="snake-overlay"></div>
+
+        <h2>💞 Aşk Testi</h2>
+        <div class="questions-grid">
+            <div class="question-card" id="card-0"><label>Seninle ilk nerede tanıştık? 🥰🏠</label><div class="answer-area" data-answer="MANİSA"></div></div>
+            <div class="question-card" id="card-1"><label>En sevdiğim, hayalimdeki araba markası? 🏎️🔥</label><div class="answer-area" data-answer="MERCEDES"></div></div>
+            <div class="question-card" id="card-2"><label>Beni en çok mutlu eden içecek? ☕😋</label><div class="answer-area" data-answer="KAHVE"></div></div>
+            <div class="question-card" id="card-3"><label>Baş başa izlediğimiz ilk filmimiz? 🎬🍿</label><div class="answer-area" data-answer="ANGELA'NIN NOEL DİLEĞİ"></div></div>
+            <div class="question-card" id="card-4"><label>Dünyanın en iyi mühendislik bölümü? 😎⚡</label><div class="answer-area" data-answer="ELEKTRİK ELEKTRONİK"></div></div>
+            <div class="question-card" id="card-5"><label>Bizim günümüz, sevgili olduğumuz tarih? 🗓️❤️</label><div class="answer-area" data-answer="1 HAZİRAN"></div></div>
+            <div class="question-card" id="card-6"><label>Beni yansıtan, en sevdiğim renk? 💚🌿</label><div class="answer-area" data-answer="YEŞİL"></div></div>
+            <div class="question-card" id="card-7"><label>Birlikte gitmek istediğimiz o ülke? ✈️🍕</label><div class="answer-area" data-answer="İTALYA"></div></div>
+            <div class="question-card" id="card-8"><label>El ele çıktığımız ilk yolculuk? 🚌🎒</label><div class="answer-area" data-answer="İSTANBUL"></div></div>
+            <div class="question-card" id="card-9"><label>Saatlerce oynadığımız o oyun? 🎮🤖</label><div class="answer-area" data-answer="DETROİT BECOME HUMAN"></div></div>
+        </div>
+        <button class="submit-btn" onclick="checkAll()">Doğrula ve Mektubu Al 💌</button>
+    </div>
+
+    <div id="envelope-wrapper" onclick="openEnvelope()">
+        <div class="envelope" id="mainEnvelope">
+            <div class="heart-sticker">❤️</div>
+            <div class="letter">
+                <h1>Canım Sevgilim!</h1>
+                <p>Beni benden bile iyi tanıdığını zaten biliyordum bitanemm... ❤️</p>
+                <p>Bu 14 Şubat'ta maalesef yan yana değiliz. Sana sarılamamak, öpememek, kokunu alamamak beni çok üzüyor...</p>
+                <p>Ama unutma, mesafeler sadece bedenler arasında olur. Kalbim her an seninle. İyi ki varsın iyi ki benimsin bebikimm... ❤️❤️</p>
+                
+                <img src="biz.jpeg" style="width: 85%; border-radius: 10px; margin: 15px auto 10px auto; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 4px solid #fff;" alt="Biz">
+                
+                <p style="font-size:0.8rem; color:#ff4d6d; font-weight: bold; margin-top:8px;">seni ÇOOOOOOKKKKK seviyorumm aşkıımmm 💖💖</p>
+            </div>
+        </div>
+        <p id="clickHint" style="text-align: center; margin-top: 270px; color: #ff4d6d; font-weight: bold; opacity: 0; transition: opacity 1s; width: 300px;">(Kalbe dokunarak açabilirsin)</p>
+    </div>
+
+    <script>
+        function trUpperCase(str) { return str.toLocaleUpperCase('tr-TR').trim(); }
+        function normalizeString(str) { return trUpperCase(str).replace(/İ/g, 'I').replace(/[\s']/g, ''); }
+
+        document.querySelectorAll('.answer-area').forEach((area, cardIndex) => {
+            const fullAnswer = area.getAttribute('data-answer'); const words = fullAnswer.split(' ');
+            words.forEach(word => {
+                const row = document.createElement('div'); row.className = 'word-row';
+                for (let char of word) {
+                    if (char === "'") { const span = document.createElement('span'); span.className = 'punctuation'; span.innerText = "'"; row.appendChild(span); }
+                    else {
+                        const input = document.createElement('input'); input.type = 'text'; input.maxLength = 1; input.className = 'letter-box';
+                        input.addEventListener('input', function() {
+                            this.value = trUpperCase(this.value);
+                            if (this.value.length === 1) { this.classList.add('filled'); const allBoxes = Array.from(area.querySelectorAll('.letter-box')); const idx = allBoxes.indexOf(this); if (allBoxes[idx + 1]) allBoxes[idx + 1].focus(); else { const nextCard = document.getElementById('card-' + (cardIndex + 1)); if (nextCard) nextCard.querySelector('.letter-box')?.focus(); } } else { this.classList.remove('filled'); }
+                        });
+                        input.addEventListener('keydown', function(e) { if (e.key === 'Backspace' && this.value === '') { this.classList.remove('filled'); const allBoxes = Array.from(area.querySelectorAll('.letter-box')); const idx = allBoxes.indexOf(this); if (allBoxes[idx - 1]) allBoxes[idx - 1].focus(); } });
+                        row.appendChild(input);
+                    }
+                } area.appendChild(row);
+            });
+        });
+
+        // --- GİRİŞ EKRANI VE GEÇİŞ ANİMASYONU ---
+        function startTest() {
+            // 1. Kalp Patlamasını Başlat (Transition Effect)
+            const overlay = document.getElementById('transition-overlay');
+            const hearts = ['❤️', '💖', '💘', '💝', '💕'];
+
+            for(let i=0; i<150; i++) { // 150 adet rastgele kalp
+                const heart = document.createElement('div');
+                heart.className = 'transition-heart';
+                heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 100 + 'vh';
+                heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                heart.style.animationDelay = (Math.random() * 0.5) + 's';
+                overlay.appendChild(heart);
+            }
+
+            // 2. Ekran Değişimi
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none'; // Giriş ekranını kapat
+                const loginBox = document.getElementById('loginBox');
+                loginBox.style.display = 'block'; // Test ekranını aç (ancak opacity 0)
+                
+                // 3. Test Ekranını Yavaşça Getir (Fade-in)
+                // requestAnimationFrame ile tarayıcının display değişimini algılamasını bekliyoruz
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        loginBox.style.transition = "opacity 2s ease-in";
+                        loginBox.style.opacity = '1';
+
+                        // Yan fotoğrafları (geniş ekransa) yavaşça göster
+                        if(window.innerWidth > 1300) {
+                            const leftPhotos = document.getElementById('leftPhotos');
+                            const rightPhotos = document.getElementById('rightPhotos');
+                            leftPhotos.style.display = 'flex';
+                            rightPhotos.style.display = 'flex';
+                            setTimeout(() => {
+                                leftPhotos.style.opacity = '1';
+                                rightPhotos.style.opacity = '1';
+                            }, 100);
+                        }
+                        // Yılanı başlat
+                        createSnake();
+                    }, 50);
+                });
+
+            }, 800); // Kalpler ekranı kaplayınca değişimi yap
+
+            // 4. Temizlik
+            setTimeout(() => { overlay.innerHTML = ''; }, 2500);
+        }
+
+        // --- YILAN OLUŞTURMA SCRIPT'İ ---
+        function createSnake() {
+            const container = document.getElementById('snake-overlay');
+            // Zaten oluşturulmuşsa tekrar oluşturma
+            if(container.children.length > 0) return;
+
+            const emojis = ['❤️', '✨', '🧡', '✨', '💛', '✨', '💚', '✨', '💙', '✨', '💜', '✨', '🖤', '✨', '🤍', '✨', '🤎', '✨', '💖', '✨'];
+            
+            for (let i = 0; i < 50; i++) {
+                const span = document.createElement('span');
+                span.className = 'snake-particle';
+                span.innerText = emojis[i % emojis.length]; 
+                span.style.animationDelay = `-${i * 0.3}s`; 
+                container.appendChild(span);
+            }
+        }
+
+        function checkAll() {
+            let win = true;
+            document.querySelectorAll('.answer-area').forEach((area, index) => { const target = normalizeString(area.getAttribute('data-answer')); let current = ""; area.querySelectorAll('.letter-box').forEach(b => current += b.value); current = normalizeString(current); const card = document.getElementById('card-' + index); if (current !== target) { win = false; card.classList.add('error'); setTimeout(() => card.classList.remove('error'), 2000); } else { card.classList.remove('error'); } });
+            if (win) {
+                startCelebration();
+            } else {
+                alert("Bazı cevaplarda hata var gibi sevgilim... 😢❤️"); 
+            }
+        }
+
+        function startCelebration() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('leftPhotos').style.display = 'none';
+            document.getElementById('rightPhotos').style.display = 'none';
+            
+            document.body.style.justifyContent = "center";
+            const overlay = document.getElementById('celebration-overlay'); overlay.style.display = 'block';
+            
+            const colors = ['#ff4d6d', '#ff859f', '#ffccd5', '#ffd700', '#8338ec', '#3a86ff'];
+            for(let i=0; i<150; i++) { const isHeart = Math.random() > 0.6; const el = document.createElement('div'); el.innerText = isHeart ? '❤️' : ''; el.className = isHeart ? 'heart-sticker' : 'confetti'; if(!isHeart) el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; el.style.left = Math.random() * 100 + 'vw'; el.style.top = -10 + 'px'; el.style.position = 'fixed'; el.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`; overlay.appendChild(el); }
+            for(let i=0; i<20; i++) { const el = document.createElement('div'); el.className = 'side-decoration'; el.innerText = Math.random() > 0.5 ? '🎈' : '✨'; el.style.left = Math.random() > 0.5 ? (Math.random()*10 + 'vw') : (90 + Math.random()*10 + 'vw'); el.style.animationDuration = (Math.random() * 2 + 3) + 's'; overlay.appendChild(el); }
+            const fireworkInterval = setInterval(() => createFirework(colors), 300);
+            
+            setTimeout(() => {
+                const scatteredItems = document.getElementById('scattered-items');
+                scatteredItems.style.display = 'block';
+                setTimeout(() => {
+                    scatteredItems.style.opacity = '1';
+                    startHeartRain(); 
+                }, 100);
+            }, 2500);
+
+            setTimeout(() => { clearInterval(fireworkInterval); const letterDiv = document.getElementById('envelope-wrapper'); letterDiv.style.display = 'block'; letterDiv.style.opacity = 0; letterDiv.style.transition = "opacity 2s"; setTimeout(() => { letterDiv.style.opacity = 1; document.getElementById("clickHint").style.opacity = 1; }, 100); setTimeout(() => { overlay.style.transition = "opacity 2s"; overlay.style.opacity = 0; setTimeout(() => { overlay.style.display = 'none'; }, 2000); }, 4000); }, 2500);
+        }
+        function createFirework(colors) { const overlay = document.getElementById('celebration-overlay'); const x = Math.random() * 100; const y = Math.random() * 50; const color = colors[Math.floor(Math.random() * colors.length)]; const burst = document.createElement('div'); burst.style.position = 'fixed'; burst.style.left = x + 'vw'; burst.style.top = y + 'vh'; burst.style.width = '10px'; burst.style.height = '10px'; burst.style.backgroundColor = color; burst.style.borderRadius = '50%'; burst.style.boxShadow = `0 0 20px 5px ${color}`; burst.style.animation = 'explode 0.8s ease-out forwards'; overlay.appendChild(burst); setTimeout(() => burst.remove(), 1000); }
+
+        function startHeartRain() {
+            const container = document.getElementById('heart-rain-overlay');
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.innerText = '❤️'; 
+                heart.classList.add('rain-heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+                container.appendChild(heart);
+                setTimeout(() => { heart.remove(); }, 5000);
+            }, 100);
+        }
+
+        function openEnvelope() {
+            document.getElementById("clickHint").style.opacity = "0";
+            startButterflies();
+            setTimeout(() => { document.getElementById("mainEnvelope").classList.add("open"); }, 500);
+        }
+
+        function startButterflies() {
+            const overlay = document.getElementById('butterfly-overlay'); overlay.style.display = 'block';
+            const colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#DB7093', '#C71585'];
+            for(let i=0; i<40; i++) {
+                const butterfly = document.createElement('div'); butterfly.className = 'butterfly-particle'; butterfly.innerText = '🦋';
+                butterfly.style.color = colors[Math.floor(Math.random() * colors.length)];
+                const angle = Math.random() * Math.PI * 2; const distance = (Math.random() * 40 + 20) + 'vw';
+                const tx = Math.cos(angle) * parseFloat(distance) + 'vw'; const ty = Math.sin(angle) * parseFloat(distance) + 'vw';
+                const rotation = Math.random() * 2 - 1;
+                butterfly.style.setProperty('--tx', tx); butterfly.style.setProperty('--ty', ty); butterfly.style.setProperty('--rot', rotation);
+                butterfly.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; overlay.appendChild(butterfly);
+            }
+            setTimeout(() => { overlay.style.display = 'none'; overlay.innerHTML = ''; }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sadece Senin İçin ❤️</title>
+    <script>
+        // Sayfa içeriği ve CSS yüklenmeden önce çalışır
+        var girisSifresi = prompt("Bu özel alana girmek için şifreyi yaz sevgilim: ❤️");
+
+        if (girisSifresi !== "1234") { // Buraya kendi şifreni yaz
+            alert("Hatalı şifre! 😊");
+            document.body.innerHTML = "<h1 style='text-align:center; margin-top:20%; font-family: sans-serif;'>Erişim Reddedildi! ⛔</h1>";
+            window.stop(); 
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
 
@@ -420,4 +430,5 @@
         }
     </script>
 </body>
+
 </html>

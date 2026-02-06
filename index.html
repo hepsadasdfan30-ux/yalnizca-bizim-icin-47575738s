@@ -5,14 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sadece Senin İçin ❤️</title>
     <script>
-        // Sayfa içeriği ve CSS yüklenmeden önce çalışır
-        var girisSifresi = prompt("şifre: ");
+// Sayfa daha yüklenmeden bu kontrolü yapar
+    var girisSifresi = prompt("Bu özel alana girmek için şifreyi yaz sevgilim: ❤️");
 
-        if (girisSifresi !== "hysty643rts") { // Buraya kendi şifreni yaz
-            alert("Hatalı şifre! 😊");
-            document.body.innerHTML = "<h1 style='text-align:center; margin-top:20%; font-family: sans-serif;'>Erişim Reddedildi! ⛔</h1>";
-            window.stop(); 
-        }
+    if (girisSifresi !== "1234") { // "1234" yerine kendi şifreni yaz
+        alert("Hatalı şifre! 😊");
+        // Sayfayı tamamen boşaltır
+        document.documentElement.innerHTML = `
+            <body style="background:#fff3f3; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+                <div style="text-align:center; font-family:sans-serif;">
+                    <h1 style="color:#ff4d6d; font-size:50px;">⛔</h1>
+                    <h2 style="color:#333;">Erişim Reddedildi!</h2>
+                    <p>Lütfen sayfayı yenileyip doğru şifreyi giriniz.</p>
+                </div>
+            </body>`;
+        throw new Error("Yanlış şifre girildiği için kod durduruldu."); // Kodun devam etmesini kesin olarak engeller
+    }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
@@ -432,4 +440,5 @@
 </body>
 
 </html>
+
 

@@ -180,7 +180,19 @@
         /* --- LAPTOP VE KÜÇÜK EKRANLI BİLGİSAYARLAR İÇİN ÖZEL AYAR (YENİ) --- */
         /* Genişliği 900px ile 1400px arasındaki ekranlar (Standart Laptoplar) */
         @media screen and (min-width: 900px) and (max-width: 1400px) {
-            
+            /* Zarf açıldığında mektubun çok yukarı gitmesini engelle */
+    .envelope.open .letter {
+        transform: translateY(-120px) !important; /* Daha az yukarı çıksın (-160px yerine -120px) */
+        height: 350px !important; /* Mektup boyunu biraz kısalt */
+        overflow-y: auto; /* Eğer yazı sığmazsa mektup içinde kaydırma çubuğu çıksın */
+    }
+
+    /* Mektup içindeki yazıların boyutunu küçült */
+    .letter h1 { font-size: 1.1rem !important; margin-bottom: 5px !important; }
+    .letter p { font-size: 0.8rem !important; margin: 5px 0 !important; line-height: 1.3 !important; }
+    
+    /* Mektup içindeki fotoğrafı küçült */
+    .letter img { width: 60% !important; margin: 10px auto !important; }
             /* 1. Yan fotoğrafları tekrar görünür yap ve küçült */
             .side-photos-container {
                 display: flex !important; /* Gizlemeyi zorla iptal et */
@@ -427,10 +439,24 @@
             }
         }
 
-        function startCelebration() {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('leftPhotos').style.display = 'none';
-            document.getElementById('rightPhotos').style.display = 'none';
+function startCelebration() {
+    // 1. Önceki tüm ekranları ve fotoğrafları KESİN olarak gizle
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('leftPhotos').style.display = 'none'; // Yan fotolar
+    document.getElementById('rightPhotos').style.display = 'none'; // Yan fotolar
+    
+    // Dağınık fotoğrafları da gizle (Eğer ekranda kalıyorsa)
+    const scattered = document.getElementById('scattered-items');
+    if(scattered) scattered.style.display = 'none'; 
+
+    // 2. Kutlamayı başlat
+    document.body.style.justifyContent = "center";
+    document.body.style.overflow = "hidden"; // Mektup açılırken kaydırma çubuğunu engelle
+    
+    const overlay = document.getElementById('celebration-overlay'); 
+    overlay.style.display = 'block';
+    
+    // ... (Kodun geri kalanı aynı şekilde devam etsin: konfetiler, havai fişekler vs.)
             
             document.body.style.justifyContent = "center";
             const overlay = document.getElementById('celebration-overlay'); overlay.style.display = 'block';
@@ -490,3 +516,4 @@
     </script>
 </body>
 </html>
+

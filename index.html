@@ -137,7 +137,7 @@
         .envelope.open .heart-sticker { opacity: 0; }
         
         .envelope.open .letter { 
-            transform: translateY(-100px); 
+            transform: translateY(-150px); 
             height: 420px; 
             z-index: 6; box-shadow: 0 5px 25px rgba(0,0,0,0.15); 
             overflow-y: auto; /* Yazı taşarsa scroll çıkar */
@@ -326,28 +326,15 @@
             if (win) { startCelebration(); } else { alert("Bazı cevaplarda hata var gibi sevgilim... 😢❤️"); }
         }
 
-function startCelebration() {
-            // 1. Önceki tüm ekranları ve fotoğrafları GİZLE (ZORLAYARAK)
-            // setProperty(..., 'important') komutu, CSS'teki !important'ı ezer.
-            
-            const elementsToHide = [
-                'loginBox', 
-                'leftPhotos', 
-                'rightPhotos', 
-                'scattered-items'
-            ];
+        function startCelebration() {
+            // Önceki ekranları temizle (GARANTİ METODU)
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('leftPhotos').style.display = 'none';
+            document.getElementById('rightPhotos').style.display = 'none';
+            const scattered = document.getElementById('scattered-items'); if(scattered) scattered.style.display = 'none';
 
-            elementsToHide.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.setProperty('display', 'none', 'important'); // İşte sihirli değnek bu!
-                }
-            });
-
-            // 2. Kutlamayı başlat
             document.body.style.justifyContent = "center";
-            const overlay = document.getElementById('celebration-overlay'); 
-            overlay.style.display = 'block';
+            const overlay = document.getElementById('celebration-overlay'); overlay.style.display = 'block';
             
             const colors = ['#ff4d6d', '#ff859f', '#ffccd5', '#ffd700', '#8338ec', '#3a86ff'];
             for(let i=0; i<150; i++) { 
@@ -359,23 +346,21 @@ function startCelebration() {
             }
             const fireworkInterval = setInterval(() => createFirework(colors), 300);
             
-            // 3. Kalp Yağmuru (Mobilde ve Masaüstünde)
             setTimeout(() => {
                 const scatteredItems = document.getElementById('scattered-items');
-                // Dağınık fotoları tekrar açmaya çalışma, sadece efektler başlasın
-                startHeartRain(); 
-            }, 100);
+                // Sadece geniş ekranda dağınık fotoları göster
+                if(window.innerWidth > 900) {
+                    scatteredItems.style.display = 'block';
+                    setTimeout(() => { scatteredItems.style.opacity = '1'; startHeartRain(); }, 100);
+                } else {
+                    startHeartRain(); // Mobilde sadece kalp yağmuru
+                }
+            }, 2500);
 
-            // 4. Mektubu Göster
             setTimeout(() => { 
                 clearInterval(fireworkInterval); 
                 const letterDiv = document.getElementById('envelope-wrapper'); 
-                letterDiv.style.display = 'block'; 
-                
-                // Mektubun görünmesini de zorla
-                letterDiv.style.setProperty('display', 'block', 'important');
-                
-                letterDiv.style.opacity = 0; letterDiv.style.transition = "opacity 2s"; 
+                letterDiv.style.display = 'block'; letterDiv.style.opacity = 0; letterDiv.style.transition = "opacity 2s"; 
                 setTimeout(() => { letterDiv.style.opacity = 1; document.getElementById("clickHint").style.opacity = 1; }, 100); 
                 setTimeout(() => { overlay.style.transition = "opacity 2s"; overlay.style.opacity = 0; setTimeout(() => { overlay.style.display = 'none'; }, 2000); }, 4000); 
             }, 2500);
@@ -422,5 +407,3 @@ function startCelebration() {
     </script>
 </body>
 </html>
-
-

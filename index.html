@@ -4,33 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sadece Senin İçin ❤️</title>
-    <head>
-    <style>
-        /* Senin mevcut kodların burada duruyor */
-        body {
-            font-family: 'Quicksand', sans-serif;
-            /* ... */
-        }
-
-        #transition-overlay {
-            /* ... */
-        }
-        
-        /* --- YENİ KODU TAM BURAYA YAPIŞTIR --- */
-        /* (Mevcut kodların bittiği, </style> etiketinin hemen öncesi) */
-
-        @media screen and (max-width: 768px) {
-            body {
-                padding: 15px;
-                flex-direction: column;
-                justify-content: flex-start;
-            }
-            h1 { font-size: 24px !important; margin-top: 30px; }
-            p { font-size: 16px !important; width: 100%; }
-            img { max-width: 100% !important; height: auto !important; margin-bottom: 20px; }
-        }
-
-    </style> </head>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
 
@@ -204,6 +177,75 @@
             z-index: 6; box-shadow: 0 5px 25px rgba(0,0,0,0.15); 
         }
         .envelope.open .letter h1, .envelope.open .letter p { opacity: 1; }
+        /* --- LAPTOP VE KÜÇÜK EKRANLI BİLGİSAYARLAR İÇİN ÖZEL AYAR (YENİ) --- */
+        /* Genişliği 900px ile 1400px arasındaki ekranlar (Standart Laptoplar) */
+        @media screen and (min-width: 900px) and (max-width: 1400px) {
+            
+            /* 1. Yan fotoğrafları tekrar görünür yap ve küçült */
+            .side-photos-container {
+                display: flex !important; /* Gizlemeyi zorla iptal et */
+                width: 140px; /* Genişliği 250px'den 140px'e düşür */
+                gap: 20px; /* Aralarındaki boşluğu azalt */
+                top: 20px;
+            }
+
+            /* 2. Fotoğrafları kenarlara daha çok yanaştır */
+            .side-photos-left { left: 10px; }
+            .side-photos-right { right: 10px; }
+
+            /* 3. Fotoğraf çerçevelerini incelt */
+            .side-photo {
+                border-width: 4px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+
+            /* 4. Ana kutuyu daralt ki yan fotoğraflara yer kalsın */
+            .main-container {
+                max-width: 550px; /* Kutuyu daralt */
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            /* 5. Yazı boyutlarını laptopa göre optimize et */
+            h1 { font-size: 1.8rem !important; margin-bottom: 10px !important; }
+            h2 { font-size: 1.6rem !important; margin-bottom: 15px !important; }
+            p { font-size: 1rem !important; }
+
+            /* 6. Soru kartlarını küçült */
+            .questions-grid {
+                gap: 15px; /* Kartlar arası boşluğu azalt */
+            }
+            .question-card {
+                padding: 15px;
+                min-height: 120px;
+            }
+            .question-card label {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+
+            /* 7. Harf kutucuklarını küçült */
+            .letter-box {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+
+            /* 8. Mektup zarfını biraz küçült */
+            .envelope { width: 300px; height: 200px; }
+            .envelope::before { border-left-width: 150px; border-right-width: 150px; border-top-width: 115px; }
+            .envelope::after { border-left-width: 150px; border-right-width: 150px; border-bottom-width: 105px; }
+            .letter { width: 280px; height: 180px; }
+            
+            /* Mektup açılınca yukarı çıkma mesafesini ayarla */
+            .envelope.open .letter {
+                transform: translateY(-160px);
+                height: 400px;
+            }
+            
+            /* Dağınık fotoğrafları da küçült */
+            .scatter-photo { width: 140px; border-width: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -447,10 +489,4 @@
         }
     </script>
 </body>
-
 </html>
-
-
-
-
-
